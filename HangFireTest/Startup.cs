@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace HangFireTest
 {
@@ -25,6 +27,16 @@ namespace HangFireTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            GlobalConfiguration.Configuration
+                .UseSqlServerStorage(Configuration.GetValue<string>("Hangfire:ConnectionString"), new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    PrepareSchemaIfNecessary = true,
+                    DisableGlobalLocks = true,
+                });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
