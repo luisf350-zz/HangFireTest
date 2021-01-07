@@ -55,6 +55,23 @@ namespace HangFireTest
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HangFireTest v1"));
             }
 
+            BackgroundJobServerOptions serverOptions = new BackgroundJobServerOptions
+            {
+                WorkerCount = 5,
+                HeartbeatInterval = new TimeSpan(0, 1, 0),
+                ServerCheckInterval = new TimeSpan(0, 1, 0),
+                SchedulePollingInterval = new TimeSpan(0, 1, 0),
+                ServerName = $"{Environment.MachineName}",
+                Queues = new[] {
+                    Configuration.GetValue<string>("Hangfire:Jobs:NameTask1"),
+                    Configuration.GetValue<string>("Hangfire:Jobs:NameTask2")
+                }
+            };
+
+            app.UseHangfireServer(serverOptions);
+
+            app.UseHangfireDashboard();
+
             app.UseRouting();
 
             app.UseAuthorization();
